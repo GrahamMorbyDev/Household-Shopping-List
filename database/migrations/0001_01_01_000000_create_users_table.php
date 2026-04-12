@@ -35,6 +35,18 @@ return new class extends Migration
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
+
+        // Shopping list items table: allow users to mark items as completed
+        if (!Schema::hasTable('shopping_list_items')) {
+            Schema::create('shopping_list_items', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+                $table->string('name');
+                $table->text('notes')->nullable();
+                $table->boolean('is_completed')->default(false);
+                $table->timestamps();
+            });
+        }
     }
 
     /**
@@ -42,6 +54,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('shopping_list_items');
         Schema::dropIfExists('users');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
